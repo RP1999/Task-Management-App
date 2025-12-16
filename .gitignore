@@ -1,0 +1,41 @@
+# General
+.DS_Store
+.idea
+.vscode
+*.log
+*.zip
+*.tar.gz
+*.rar
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Mobile
+index.android.bundle
+android/app/build
+android/app/src/main/assets/index.android.bundle
+android/.gradle
+ios/Pods
+ios/build
+ios/*.xcworkspace
+ios/*.xcodeproj/project.xcworkspace
+ios/*.xcodeproj/xcuserdata
+
+# React Native
+.expo/
+web-build/
+
+# Fastlane
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+*/fastlane/test_output
+
+# Bundle
+*.jsbundle
+
+# Android Key (Never commit this in real prod, but standard for template)
+*.keystore
