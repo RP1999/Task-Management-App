@@ -1,4 +1,5 @@
-export const colors = {
+export const lightTheme = {
+  mode: 'light',
   primary: '#2C5F8D',
   secondary: '#4A90E2',
   accent: '#FF8C42',
@@ -11,7 +12,28 @@ export const colors = {
   borderLight: '#EDF2F7',
   error: '#E53E3E',
   white: '#FFFFFF',
+  statusBar: 'dark-content',
 };
+
+export const darkTheme = {
+  mode: 'dark',
+  primary: '#4A90E2', // Lighter blue for dark mode
+  secondary: '#2C5F8D',
+  accent: '#FF8C42',
+  success: '#52C997',
+  surface: '#1A202C', // Dark gray
+  background: '#171923', // Very dark gray
+  textPrimary: '#F7FAFC', // White-ish
+  textSecondary: '#A0AEC0', // Light gray
+  border: '#2D3748',
+  borderLight: '#4A5568',
+  error: '#FB8181', // Lighter red
+  white: '#FFFFFF',
+  statusBar: 'light-content',
+};
+
+export const colors = lightTheme; // Default export for backwards compatibility
+
 
 export const typography = {
   h1: 32,

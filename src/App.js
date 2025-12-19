@@ -1,34 +1,55 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme as NavDarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'react-native';
-import { colors, typography } from './styles/theme';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { typography } from './styles/theme';
 
 import HomeScreen from './screens/HomeScreen';
 import TaskDetailScreen from './screens/TaskDetailScreen';
 import CreateEditTaskScreen from './screens/CreateEditTaskScreen';
+import { LogBox } from 'react-native';
+
+// Ignore specific warnings
+LogBox.ignoreLogs([
+  'new NativeEventEmitter() was called with a non-null argument',
+]);
 
 const Stack = createStackNavigator();
 
-const App = () => {
+const MainApp = () => {
+  const { theme, isDark } = useTheme();
+
+  const navigationTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: theme.background,
+      card: theme.surface,
+      text: theme.textPrimary,
+      border: theme.border,
+      primary: theme.primary,
+    },
+  };
+
   return (
     <>
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor={colors.surface}
+        barStyle={theme.statusBar}
+        backgroundColor={theme.surface}
       />
-      <NavigationContainer>
+      <NavigationContainer theme={navigationTheme}>
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{
             headerStyle: {
-              backgroundColor: colors.surface,
+              backgroundColor: theme.surface,
               elevation: 0,
               shadowOpacity: 0,
               borderBottomWidth: 1,
-              borderBottomColor: colors.borderLight,
+              borderBottomColor: theme.borderLight,
             },
-            headerTintColor: colors.primary,
+            headerTintColor: theme.primary,
             headerTitleStyle: {
               fontWeight: typography.semiBold,
               fontSize: typography.h5,
@@ -64,4 +85,13 @@ const App = () => {
   );
 };
 
+const App = () => {
+  return (
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
+  );
+};
+
 export default App;
+
