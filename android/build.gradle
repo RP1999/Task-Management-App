@@ -39,6 +39,11 @@ allprojects {
 
     configurations.all {
         resolutionStrategy {
+            dependencySubstitution {
+                substitute module("com.facebook.react:react-native") using module("com.facebook.react:react-android:0.72.10")
+            }
+            force "com.facebook.react:react-android:0.72.10"
+            force "com.facebook.react:hermes-android:0.72.10"
             force "androidx.core:core:1.10.1"
             force "androidx.core:core-ktx:1.10.1"
             force "androidx.appcompat:appcompat:1.6.1"

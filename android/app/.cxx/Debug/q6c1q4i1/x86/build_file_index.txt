@@ -1,0 +1,1 @@
+/Users/ranidupromod/Downloads/files/node_modules/react-native/ReactAndroid/cmake-utils/default-app-setup/CMakeLists.txt
