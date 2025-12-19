@@ -18,6 +18,7 @@ index.android.bundle
 android/app/build
 android/app/src/main/assets/index.android.bundle
 android/.gradle
+android/**/.cxx/
 ios/Pods
 ios/build
 ios/*.xcworkspace
