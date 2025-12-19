@@ -1,16 +1,19 @@
 // src/components/TaskCard.js
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
 } from 'react-native';
-import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { getRelativeTime, getPriorityColor, truncateText } from '../utils/helpers';
+import { useTheme } from '../context/ThemeContext';
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // We will enable this later after confirming install
 
 const TaskCard = ({ task, onPress, onToggleComplete, onDelete }) => {
+  const { theme } = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const priorityColor = getPriorityColor(task.priority);
   
   return (
@@ -35,15 +38,22 @@ const TaskCard = ({ task, onPress, onToggleComplete, onDelete }) => {
 
         {/* Middle: Task Content */}
         <View style={styles.contentContainer}>
-          <Text
-            style={[
-              styles.title,
-              task.completed && styles.titleCompleted
-            ]}
-            numberOfLines={2}
-          >
-            {task.title}
-          </Text>
+          <View style={styles.headerRow}>
+             <Text
+              style={[
+                styles.title,
+                task.completed && styles.titleCompleted
+              ]}
+              numberOfLines={1}
+            >
+              {task.title}
+            </Text>
+            {task.category && (
+               <View style={styles.categoryBadge}>
+                 <Text style={styles.categoryText}>{task.category}</Text>
+               </View>
+            )}
+          </View>
           
           {task.description && (
             <Text
@@ -63,10 +73,17 @@ const TaskCard = ({ task, onPress, onToggleComplete, onDelete }) => {
               </Text>
             </View>
 
-            {/* Timestamp */}
-            <Text style={styles.timestamp}>
-              {getRelativeTime(task.createdAt)}
-            </Text>
+            {/* Date/Time info */}
+            <View style={styles.dateContainer}>
+               {task.dueDate && (
+                 <Text style={[styles.timestamp, { marginRight: 8, color: theme.accent }]}>
+                   📅 {new Date(task.dueDate).toLocaleDateString()}
+                 </Text>
+               )}
+               <Text style={styles.timestamp}>
+                {getRelativeTime(task.updatedAt || task.createdAt)}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -77,19 +94,21 @@ const TaskCard = ({ task, onPress, onToggleComplete, onDelete }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   container: {
     marginBottom: spacing.md,
     marginHorizontal: spacing.md,
   },
   cardContent: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
+    backgroundColor: theme.surface,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     ...shadows.md,
     position: 'relative',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.borderLight,
   },
   checkboxContainer: {
     marginRight: spacing.md,
@@ -101,44 +120,65 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: borderRadius.sm,
     borderWidth: 2,
-    borderColor: colors.border,
+    borderColor: theme.border,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: theme.surface,
   },
   checkboxCompleted: {
-    backgroundColor: colors.success,
-    borderColor: colors.success,
+    backgroundColor: theme.success,
+    borderColor: theme.success,
   },
   checkmark: {
-    color: colors.textInverse,
+    color: theme.white,
     fontSize: 14,
     fontWeight: typography.bold,
   },
   contentContainer: {
     flex: 1,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
   title: {
     fontSize: typography.body,
     fontWeight: typography.semiBold,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-    lineHeight: typography.body * typography.lineHeightNormal,
+    color: theme.textPrimary,
+    flex: 1,
+    marginRight: spacing.sm,
   },
   titleCompleted: {
     textDecorationLine: 'line-through',
-    color: colors.textTertiary,
+    color: theme.textSecondary,
+  },
+  categoryBadge: {
+    backgroundColor: theme.background,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: theme.border,
+  },
+  categoryText: {
+    fontSize: 10,
+    color: theme.textSecondary,
+    fontWeight: '600',
   },
   description: {
     fontSize: typography.bodySmall,
-    color: colors.textSecondary,
+    color: theme.textSecondary,
     marginBottom: spacing.sm,
-    lineHeight: typography.bodySmall * typography.lineHeightNormal,
+    lineHeight: 18,
   },
   metaContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: spacing.xs,
+    flexWrap: 'wrap',
   },
   priorityBadge: {
     flexDirection: 'row',
@@ -157,9 +197,13 @@ const styles = StyleSheet.create({
     fontSize: typography.caption,
     fontWeight: typography.semiBold,
   },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   timestamp: {
     fontSize: typography.caption,
-    color: colors.textTertiary,
+    color: theme.textSecondary,
   },
   priorityIndicator: {
     position: 'absolute',

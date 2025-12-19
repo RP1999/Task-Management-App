@@ -2,22 +2,17 @@ import { PRIORITY_LEVELS } from './constants';
 
 export const sortTasks = (tasks) => {
   return tasks.sort((a, b) => {
-    // Sort by completion status (active first)
+    // 1. Sort by completion status (Active first, Completed last)
     if (a.completed !== b.completed) {
       return a.completed ? 1 : -1;
     }
     
-    // Sort by priority (High > Medium > Low)
-    const priorityOrder = { [PRIORITY_LEVELS.HIGH]: 3, [PRIORITY_LEVELS.MEDIUM]: 2, [PRIORITY_LEVELS.LOW]: 1 };
-    const pA = priorityOrder[a.priority] || 0;
-    const pB = priorityOrder[b.priority] || 0;
+    // 2. Sort by last modified date (Newest updated/created first)
+    // Use updatedAt if available, otherwise createdAt
+    const dateA = new Date(a.updatedAt || a.createdAt);
+    const dateB = new Date(b.updatedAt || b.createdAt);
     
-    if (pA !== pB) {
-      return pB - pA;
-    }
-    
-    // Sort by date (newest first)
-    return new Date(b.createdAt) - new Date(a.createdAt);
+    return dateB - dateA;
   });
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { 
   View,
@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
 import { taskService } from '../services/api';
 import { 
   sortTasks, 
@@ -23,8 +24,12 @@ import TaskCard from '../components/TaskCard';
 import SearchBar from '../components/SearchBar';
 import FilterButtons from '../components/FilterButtons';
 import EmptyState from '../components/EmptyState';
+import RNPrint from 'react-native-print';
 
 const HomeScreen = ({ navigation }) => {
+  const { theme, toggleTheme, isDark } = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +83,6 @@ const HomeScreen = ({ navigation }) => {
 
   const handleToggleComplete = async (task) => {
     try {
-      // Assuming updateTask usage for toggle as specific toggle endpoint wasn't in api.js
       const result = await taskService.updateTask(task.id, { ...task, completed: !task.completed });
       
       if (result.status === 200 || result.data) {
@@ -133,13 +137,59 @@ const HomeScreen = ({ navigation }) => {
   const handleCreateTask = () => {
     navigation.navigate('CreateEditTask', { mode: 'create' });
   };
+  
+  const handleExportPDF = async () => {
+    try {
+      const html = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Helvetica, Arial, sans-serif; padding: 20px; }
+              h1 { color: ${theme.primary}; }
+              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+              th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+              th { background-color: #f2f2f2; }
+              .completed { text-decoration: line-through; color: #888; }
+            </style>
+          </head>
+          <body>
+            <h1>Task List</h1>
+            <p>Generated on ${new Date().toLocaleDateString()}</p>
+            <table>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Due Date</th>
+                <th>Status</th>
+              </tr>
+              ${filteredTasks.map(task => `
+                <tr class="${task.completed ? 'completed' : ''}">
+                  <td>${task.title}</td>
+                  <td>${task.category || '-'}</td>
+                  <td>${task.priority || 'Medium'}</td>
+                  <td>${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}</td>
+                  <td>${task.completed ? 'Completed' : 'Active'}</td>
+                </tr>
+              `).join('')}
+            </table>
+          </body>
+        </html>
+      `;
+
+      await RNPrint.print({ html });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to generate PDF');
+    }
+  };
 
   const taskStats = getTaskStats(tasks);
 
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={theme.primary} />
         <Text style={styles.loadingText}>Loading tasks...</Text>
       </View>
     );
@@ -148,7 +198,17 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Task Manager</Text>
+        <View style={styles.headerTopRow}>
+          <Text style={styles.headerTitle}>Task Manager</Text>
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={handleExportPDF} style={styles.iconButton}>
+               <Text style={{fontSize: 20}}>📄</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleTheme} style={styles.iconButton}>
+               <Text style={{fontSize: 20}}>{isDark ? '☀️' : '🌙'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <View style={styles.statsContainer}>
           <Text style={styles.statsText}>
             {taskStats.active} active • {taskStats.completed} completed
@@ -188,8 +248,8 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
+            colors={[theme.primary]}
+            tintColor={theme.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -206,42 +266,56 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.background,
   },
   centerContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: theme.background,
   },
   loadingText: {
     marginTop: spacing.md,
     fontSize: typography.body,
-    color: colors.textSecondary,
+    color: theme.textSecondary,
   },
   header: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
-    backgroundColor: colors.surface,
+    backgroundColor: theme.surface,
     ...shadows.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.borderLight,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
   },
   headerTitle: {
     fontSize: typography.h2,
     fontWeight: typography.bold,
-    color: colors.primary,
-    marginBottom: spacing.xs,
+    color: theme.primary,
+  },
+  headerActions: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    marginLeft: spacing.m,
+    padding: 4,
   },
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   statsText: {
-    fontSize: typography.bodySmall,
-    color: colors.textSecondary,
+    fontSize: 12, // bodySmall
+    color: theme.textSecondary,
   },
   listContent: {
     paddingVertical: spacing.md,
@@ -256,14 +330,14 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.accent,
+    backgroundColor: theme.accent,
     alignItems: 'center',
     justifyContent: 'center',
     ...shadows.lg,
   },
   fabIcon: {
     fontSize: 32,
-    color: colors.textInverse,
+    color: theme.white,
     fontWeight: typography.regular,
   },
 });
