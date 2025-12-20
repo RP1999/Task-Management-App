@@ -35,8 +35,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/RP1999/MediTask.git
-   cd MediTask
+   git clone https://github.com/RP1999/Task-Management-App.git
+   cd Task-Management-App
    ```
 
 2. **Install dependencies**
