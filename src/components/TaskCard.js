@@ -1,219 +1,110 @@
-// src/components/TaskCard.js
-import React, { useMemo } from 'react';
+import React from 'react';
+import styles from '../styles/TaskCard.styles';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
+  Pressable,
 } from 'react-native';
-import { typography, spacing, borderRadius, shadows } from '../styles/theme';
-import { getRelativeTime, getPriorityColor, truncateText } from '../utils/helpers';
-import { useTheme } from '../context/ThemeContext';
-// import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // We will enable this later after confirming install
+import Icon from 'react-native-vector-icons/Feather';
+import Animated, { FadeInDown, Layout, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 
-const TaskCard = ({ task, onPress, onToggleComplete, onDelete }) => {
-  const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const TaskCard = ({ task, onPress, onToggleComplete, index = 0 }) => {
+  const isCompleted = task.completed;
+  const scale = useSharedValue(1);
+
+  const getPriorityColor = (p) => {
+    switch (p?.toLowerCase()) {
+      case 'high': return colors.danger;
+      case 'medium': return colors.warning;
+      case 'low': return colors.success;
+      default: return colors.textTertiary;
+    }
+  };
+
   const priorityColor = getPriorityColor(task.priority);
-  
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1);
+  };
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={() => onPress(task)}
+    <Animated.View 
+      entering={FadeInDown.delay(index * 100).springify()} 
+      layout={Layout.springify()}
       style={styles.container}
     >
-      <View style={styles.cardContent}>
-        {/* Left: Checkbox */}
-        <TouchableOpacity
-          onPress={() => onToggleComplete(task)}
-          style={styles.checkboxContainer}
-        >
-          <View style={[
-            styles.checkbox,
-            task.completed && styles.checkboxCompleted
-          ]}>
-            {task.completed && <Text style={styles.checkmark}>✓</Text>}
-          </View>
-        </TouchableOpacity>
+      <AnimatedPressable
+        onPress={() => onPress(task)}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[styles.cardContent, animatedStyle]}
+      >
+        {/* Priority Strip */}
+        <View style={[styles.priorityStrip, { backgroundColor: priorityColor }]} />
 
-        {/* Middle: Task Content */}
-        <View style={styles.contentContainer}>
+        <View style={styles.contentWrapper}>
           <View style={styles.headerRow}>
-             <Text
-              style={[
-                styles.title,
-                task.completed && styles.titleCompleted
-              ]}
-              numberOfLines={1}
-            >
-              {task.title}
-            </Text>
-            {task.category && (
-               <View style={styles.categoryBadge}>
-                 <Text style={styles.categoryText}>{task.category}</Text>
+             <View style={[styles.categoryBadge, styles.badgeBackground]}>
+                <Text style={styles.categoryText}>{task.category || 'Personal'}</Text>
+             </View>
+             {task.priority && (
+               <View style={[styles.priorityBadge, { backgroundColor: priorityColor + '20' }]}>
+                 <Text style={[styles.priorityText, { color: priorityColor }]}>{task.priority}</Text>
                </View>
-            )}
+             )}
           </View>
-          
-          {task.description && (
-            <Text
-              style={styles.description}
-              numberOfLines={2}
-            >
-              {truncateText(task.description, 100)}
-            </Text>
+
+          <Text
+            style={[styles.title, isCompleted && styles.titleCompleted]}
+            numberOfLines={2}
+          >
+            {task.title}
+          </Text>
+
+          {task.dueDate && (
+            <View style={styles.metaRow}>
+              <Icon 
+                name="clock" 
+                size={14} 
+                color={(!isCompleted && new Date(task.dueDate) < new Date()) ? colors.danger : colors.textSecondary} 
+              />
+              <Text style={[
+                styles.timeText, 
+                (!isCompleted && new Date(task.dueDate) < new Date()) && { color: colors.danger, fontWeight: '700' }
+              ]}>
+                {new Date(task.dueDate).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </Text>
+            </View>
           )}
-
-          <View style={styles.metaContainer}>
-            {/* Priority Badge */}
-            <View style={[styles.priorityBadge, { backgroundColor: priorityColor + '20' }]}>
-              <View style={[styles.priorityDot, { backgroundColor: priorityColor }]} />
-              <Text style={[styles.priorityText, { color: priorityColor }]}>
-                {task.priority?.toUpperCase() || 'MEDIUM'}
-              </Text>
-            </View>
-
-            {/* Date/Time info */}
-            <View style={styles.dateContainer}>
-               {task.dueDate && (
-                 <Text style={[styles.timestamp, { marginRight: 8, color: theme.accent }]}>
-                   📅 {new Date(task.dueDate).toLocaleDateString()}
-                 </Text>
-               )}
-               <Text style={styles.timestamp}>
-                {getRelativeTime(task.updatedAt || task.createdAt)}
-              </Text>
-            </View>
-          </View>
         </View>
 
-        {/* Right: Priority Indicator */}
-        <View style={[styles.priorityIndicator, { backgroundColor: priorityColor }]} />
-      </View>
-    </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.checkboxContainer, 
+            isCompleted && styles.checkboxCompleted,
+            { borderColor: isCompleted ? colors.primary : colors.border }
+          ]}
+          onPress={() => onToggleComplete(task)}
+          hitSlop={10}
+        >
+          {isCompleted && <Icon name="check" size={16} color={colors.white} />}
+        </TouchableOpacity>
+      </AnimatedPressable>
+    </Animated.View>
   );
 };
-
-const createStyles = (theme) => StyleSheet.create({
-  container: {
-    marginBottom: spacing.md,
-    marginHorizontal: spacing.md,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    backgroundColor: theme.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    ...shadows.md,
-    position: 'relative',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: theme.borderLight,
-  },
-  checkboxContainer: {
-    marginRight: spacing.md,
-    justifyContent: 'flex-start',
-    paddingTop: 2,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: borderRadius.sm,
-    borderWidth: 2,
-    borderColor: theme.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.surface,
-  },
-  checkboxCompleted: {
-    backgroundColor: theme.success,
-    borderColor: theme.success,
-  },
-  checkmark: {
-    color: theme.white,
-    fontSize: 14,
-    fontWeight: typography.bold,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  title: {
-    fontSize: typography.body,
-    fontWeight: typography.semiBold,
-    color: theme.textPrimary,
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  titleCompleted: {
-    textDecorationLine: 'line-through',
-    color: theme.textSecondary,
-  },
-  categoryBadge: {
-    backgroundColor: theme.background,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  categoryText: {
-    fontSize: 10,
-    color: theme.textSecondary,
-    fontWeight: '600',
-  },
-  description: {
-    fontSize: typography.bodySmall,
-    color: theme.textSecondary,
-    marginBottom: spacing.sm,
-    lineHeight: 18,
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.xs,
-    flexWrap: 'wrap',
-  },
-  priorityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.md,
-  },
-  priorityDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: spacing.xs,
-  },
-  priorityText: {
-    fontSize: typography.caption,
-    fontWeight: typography.semiBold,
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  timestamp: {
-    fontSize: typography.caption,
-    color: theme.textSecondary,
-  },
-  priorityIndicator: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    borderTopRightRadius: borderRadius.lg,
-    borderBottomRightRadius: borderRadius.lg,
-  },
-});
 
 export default TaskCard;
