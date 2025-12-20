@@ -51,11 +51,7 @@
    npx react-native run-android
    ```
    
-   *For iOS:*
-   ```bash
-   cd ios && pod install && cd ..
-   npx react-native run-ios
-   ```
+
 
 ## �️ Built With
 
