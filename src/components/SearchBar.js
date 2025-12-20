@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { colors, spacing, borderRadius, typography } from '../styles/theme';
+import { colors } from '../styles/theme';
+import styles from '../styles/SearchBar.styles';
 
 const SearchBar = ({ value, onChangeText, onClear }) => {
   return (
@@ -21,31 +22,5 @@ const SearchBar = ({ value, onChangeText, onClear }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: spacing.m,
-    paddingVertical: spacing.s,
-    backgroundColor: colors.background,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    padding: spacing.s,
-    paddingHorizontal: spacing.m,
-    borderRadius: 8,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  clearButton: {
-    position: 'absolute',
-    right: spacing.l,
-    top: spacing.s + 10, // Approximate centering
-  },
-  clearText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  }
-});
-
 export default SearchBar;
+
