@@ -10,6 +10,9 @@
   <img src="screenshots/notifications.png" width="200" alt="Notifications" />
   <img src="screenshots/create_task.png" width="200" alt="Create Task" />
   <img src="screenshots/task_details.png" width="200" alt="Task Details" />
+  <img src="screenshots/schedule.png" width="200" alt="Schedule" />
+  <img src="screenshots/reports.png" width="200" alt="Reports" />
+  <img src="screenshots/profile.png" width="200" alt="Profile" />
 </p>
 
 ## ✨ Features
