@@ -35,8 +35,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repository-url>
-   cd <project-directory>
+   git clone https://github.com/RP1999/MediTask.git
+   cd MediTask
    ```
 
 2. **Install dependencies**
