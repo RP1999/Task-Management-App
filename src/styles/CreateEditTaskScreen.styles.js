@@ -1,0 +1,180 @@
+import { StyleSheet } from 'react-native';
+import { spacing, typography, borderRadius } from './theme';
+
+export const createStyles = (theme) => StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.background,
+  },
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 40,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    marginTop: spacing.md, 
+  },
+  backButton: {
+    marginRight: spacing.md,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
+    backgroundColor: theme.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: theme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  backButtonIcon: {
+    display: 'none', 
+  },
+  headerTitle: {
+    fontSize: typography.h3,
+    fontWeight: typography.bold,
+    color: theme.textPrimary, 
+    flex: 1,
+  },
+  formGroup: {
+    marginBottom: spacing.lg,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.textSecondary,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  input: {
+    backgroundColor: theme.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    // No border width for cleaner look, use shadow instead
+    borderWidth: 0, 
+    fontSize: typography.body,
+    color: theme.textPrimary,
+    shadowColor: theme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  textArea: {
+    minHeight: 120,
+    textAlignVertical: 'top',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: borderRadius.round,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
+    marginBottom: 4,
+  },
+  chipActive: {
+    backgroundColor: theme.primary,
+    borderColor: theme.primary,
+    shadowColor: theme.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  chipText: {
+    color: theme.textSecondary,
+    fontSize: typography.bodySmall,
+    fontWeight: typography.medium,
+  },
+  chipTextActive: {
+    color: theme.white,
+    fontWeight: typography.bold,
+  },
+  dateTimeRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  dateButton: {
+    flex: 1,
+    backgroundColor: theme.surface,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 0, // Cleaner
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    shadowColor: theme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  dateButtonText: {
+    fontSize: typography.body,
+    fontWeight: typography.medium,
+    color: theme.textPrimary,
+  },
+  priorityContainer: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  priorityButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: theme.border,
+    alignItems: 'center',
+    backgroundColor: theme.surface,
+  },
+  priorityButtonActive: {
+    backgroundColor: theme.primary + '15',
+    borderColor: theme.primary,
+  },
+  priorityText: {
+    fontSize: typography.body,
+    color: theme.textSecondary,
+    fontWeight: typography.medium,
+  },
+  priorityTextActive: {
+    color: theme.primary,
+    fontWeight: typography.bold,
+  },
+  submitButton: {
+    backgroundColor: theme.primary,
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
+    alignItems: 'center',
+    marginTop: spacing.xl,
+    height: 56,
+    justifyContent: 'center',
+    shadowColor: theme.primary,
+    shadowOffset: { width: 0, height: 8 }, // Deeper shadow
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  submitButtonText: {
+    color: theme.white,
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+});

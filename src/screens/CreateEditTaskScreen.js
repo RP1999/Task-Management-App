@@ -12,14 +12,16 @@ import {
   ActivityIndicator
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Icon from 'react-native-vector-icons/Ionicons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { typography, spacing, borderRadius } from '../styles/theme';
+import { createStyles } from '../styles/CreateEditTaskScreen.styles';
 import { useTheme } from '../context/ThemeContext';
 import { taskService } from '../services/api';
 import { notificationService } from '../utils/notifications';
 import { PRIORITY_LEVELS } from '../utils/constants';
 
-const CATEGORIES = ['Personal', 'Patients', 'Admin'];
+const CATEGORIES = ['Personal', 'Patients'];
 
 const CreateEditTaskScreen = ({ navigation, route }) => {
   const { theme } = useTheme();
@@ -62,6 +64,10 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
   const onTimeChange = (event, selectedDate) => {
     setShowTimePicker(false);
     if (selectedDate) {
+      if (selectedDate < new Date(Date.now() - 60000)) {
+        Alert.alert("Invalid Time", "Please select a future time.");
+        return;
+      }
       setDueDate(selectedDate);
     }
   };
@@ -69,6 +75,12 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
   const handleSubmit = async () => {
     if (!title.trim()) {
       Alert.alert('Validation Error', 'Please enter a task title');
+      return;
+    }
+
+    // Allow 1 minute buffer for immediate submissions
+    if (!isEditing && dueDate < new Date(Date.now() - 60000)) {
+      Alert.alert('Validation Error', 'Due date cannot be in the past');
       return;
     }
 
@@ -138,14 +150,17 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <Animated.ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        entering={FadeInDown.duration(600).springify()}
+      >
         <View style={styles.headerRow}>
           <TouchableOpacity 
             onPress={() => navigation.goBack()} 
             style={styles.backButton}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} // Increase touch area
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} 
           >
-            <Text style={styles.backButtonIcon}>←</Text>
+            <Icon name="caret-back" size={24} color={theme.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
             {isEditing ? 'Edit Task' : 'New Task'}
@@ -175,6 +190,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
                   category === cat && styles.chipActive
                 ]}
                 onPress={() => setCategory(cat)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.chipText,
@@ -191,6 +207,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
             <TouchableOpacity 
               style={styles.dateButton}
               onPress={() => setShowDatePicker(true)}
+              activeOpacity={0.7}
             >
               <Text style={styles.dateButtonText}>
                 📅 {dueDate.toLocaleDateString()}
@@ -200,6 +217,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
             <TouchableOpacity 
               style={styles.dateButton}
               onPress={() => setShowTimePicker(true)}
+              activeOpacity={0.7}
             >
               <Text style={styles.dateButtonText}>
                 ⏰ {dueDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -223,6 +241,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
               mode="time"
               display="default"
               onChange={onTimeChange}
+              minimumDate={new Date()}
             />
           )}
         </View>
@@ -238,6 +257,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
                   reminderOffset === opt.value && styles.chipActive
                 ]}
                 onPress={() => setReminderOffset(opt.value)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.chipText,
@@ -274,6 +294,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
                   { borderColor: priority === level ? theme.primary : theme.border }
                 ]}
                 onPress={() => setPriority(level)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.priorityText,
@@ -290,6 +311,7 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
           style={[styles.submitButton, loading && styles.buttonDisabled]}
           onPress={handleSubmit}
           disabled={loading}
+          activeOpacity={0.8}
         >
           {loading ? (
              <ActivityIndicator color={theme.white} />
@@ -299,162 +321,10 @@ const CreateEditTaskScreen = ({ navigation, route }) => {
              </Text>
           )}
         </TouchableOpacity>
-      </ScrollView>
+      </Animated.ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-const createStyles = (theme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.background,
-  },
-  scrollContent: {
-    padding: spacing.l,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start', // Changed from space-between to align left
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  backButton: {
-    marginRight: spacing.m,
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.border,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonIcon: {
-    fontSize: 24,
-    color: theme.primary,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    textAlignVertical: 'center', // Android
-    includeFontPadding: false, // Android
-    lineHeight: 24, // Match fontSize for better vertical centering
-  },
-  headerTitle: {
-    fontSize: typography.h2,
-    fontWeight: typography.bold,
-    color: theme.primary,
-  },
-  micButton: {
-    padding: 8,
-    backgroundColor: theme.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  micText: {
-    fontSize: 14,
-    color: theme.accent,
-  },
-  formGroup: {
-    marginBottom: spacing.l,
-  },
-  label: {
-    fontSize: typography.body,
-    fontWeight: typography.semiBold,
-    color: theme.textPrimary,
-    marginBottom: spacing.s,
-  },
-  input: {
-    backgroundColor: theme.surface,
-    borderRadius: 8,
-    padding: spacing.m,
-    borderWidth: 1,
-    borderColor: theme.border,
-    fontSize: typography.body,
-    color: theme.textPrimary,
-  },
-  textArea: {
-    minHeight: 120,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.s,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  chipActive: {
-    backgroundColor: theme.secondary,
-    borderColor: theme.secondary,
-  },
-  chipText: {
-    color: theme.textSecondary,
-    fontSize: 12,
-  },
-  chipTextActive: {
-    color: theme.white,
-    fontWeight: 'bold',
-  },
-  dateTimeRow: {
-    flexDirection: 'row',
-    gap: spacing.m,
-  },
-  dateButton: {
-    flex: 1,
-    backgroundColor: theme.surface,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.border,
-    alignItems: 'center',
-  },
-  priorityContainer: {
-    flexDirection: 'row',
-    gap: spacing.s,
-  },
-  priorityButton: {
-    flex: 1,
-    paddingVertical: spacing.s,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: 'center',
-    backgroundColor: theme.surface,
-  },
-  priorityButtonActive: {
-    backgroundColor: theme.primary + '10', 
-  },
-  priorityText: {
-    fontSize: typography.body,
-    color: theme.textSecondary,
-    fontWeight: typography.medium,
-  },
-  priorityTextActive: {
-    color: theme.primary,
-    fontWeight: typography.bold,
-  },
-  submitButton: {
-    backgroundColor: theme.primary,
-    padding: spacing.m,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: spacing.l,
-    height: 50,
-    justifyContent: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: theme.white,
-    fontSize: typography.h5,
-    fontWeight: typography.bold,
-  },
-});
-
 export default CreateEditTaskScreen;
+
