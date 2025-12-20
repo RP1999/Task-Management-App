@@ -19,6 +19,7 @@
 
 - **Dual Category System**: Distinctly categorize tasks as **Patients** or **Personal** to keep your professional and private life organized but separated.
 - **Smart Notifications**: Intelligent overdue task sorting that prioritizes the most critical and recent items first.
+- **Early Reminders**: Set custom reminders (10 mins, 30 mins, 1 hour before) to stay ahead of your schedule.
 - **Dashboard Overview**: At-a-glance view of daily goals, progress tracking, and urgent tasks.
 - **Detailed Analytics**: Weekly reports and completion statistics to track your productivity.
 - **Priority Levels**: Assign High, Medium, or Low priority to tasks to focus on what matters most.
@@ -34,14 +35,14 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/RP1999/MediTask.git
-   cd MediTask
+   git clone <your-repository-url>
+   cd <project-directory>
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
-   ```
+   ``` 
 
 3. **Run the application**
    
