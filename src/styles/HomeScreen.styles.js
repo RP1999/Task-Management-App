@@ -25,6 +25,27 @@ export default StyleSheet.create({
     paddingTop: spacing.xxl, // More top breathing room
     paddingBottom: spacing.lg,
   },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  notificationButton: {
+    padding: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.round,
+    ...shadows.sm,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.danger,
+    zIndex: 1,
+  },
   dashboardTitle: {
     fontSize: 14,
     fontWeight: '700',
