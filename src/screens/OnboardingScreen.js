@@ -9,7 +9,9 @@ import {
   Dimensions,
   StatusBar,
 } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,25 +31,19 @@ const OnboardingScreen = ({ navigation }) => {
       <View style={styles.illustrationContainer}>
         {/* Placeholder for 3D illustration - you can replace with actual image */}
         <View style={styles.illustrationWrapper}>
-          <Text style={styles.illustrationEmoji}>👨‍💻</Text>
-          <View style={styles.floatingIcon1}>
-            <Text style={styles.floatingEmoji}>⏰</Text>
-          </View>
-          <View style={styles.floatingIcon2}>
-            <Text style={styles.floatingEmoji}>📋</Text>
-          </View>
-          <View style={styles.floatingIcon3}>
-            <Text style={styles.floatingEmoji}>📊</Text>
-          </View>
-          <View style={styles.floatingIcon4}>
-            <Text style={styles.floatingEmoji}>🎯</Text>
-          </View>
+          <LottieView
+            source={{ uri: 'https://lottie.host/dbf1460a-200d-4995-bab3-792f660695a3/PXDccGTvb2.lottie' }}
+            autoPlay
+            loop
+            style={styles.illustration}
+          />
         </View>
       </View>
 
       {/* Content */}
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>Task Management &</Text>
+        <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.title}>MediTask</Text>
         <Text style={styles.titleHighlight}>To-Do List</Text>
         
         <Text style={styles.subtitle}>
@@ -62,7 +58,7 @@ const OnboardingScreen = ({ navigation }) => {
         >
           <Text style={styles.buttonText}>Let's Start</Text>
           <View style={styles.buttonArrow}>
-            <Text style={styles.arrowText}>→</Text>
+            <Icon name="arrow-forward" size={20} color={colors.white} />
           </View>
         </TouchableOpacity>
       </View>
