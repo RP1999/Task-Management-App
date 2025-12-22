@@ -30,3 +30,9 @@ export const ERROR_MESSAGES = {
   UPDATE_FAILED: 'Failed to update task',
   DELETE_FAILED: 'Failed to delete task',
 };
+
+export const TASK_GROUPS = [
+  { id: '1', title: 'Office Project', icon: '💼', tasks: '23 Tasks', progress: 70, color: '#7C3AED' },
+  { id: '2', title: 'Personal Project', icon: '👤', tasks: '30 Tasks', progress: 52, color: '#EC4899' },
+  { id: '3', title: 'Daily Study', icon: '📚', tasks: '30 Tasks', progress: 87, color: '#F59E0B' },
+];

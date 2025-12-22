@@ -1,14 +1,17 @@
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme as NavDarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StatusBar } from 'react-native';
+import { StatusBar, LogBox } from 'react-native';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { typography } from './styles/theme';
 
 import HomeScreen from './screens/HomeScreen';
 import TaskDetailScreen from './screens/TaskDetailScreen';
 import CreateEditTaskScreen from './screens/CreateEditTaskScreen';
-import { LogBox } from 'react-native';
+import OnboardingScreen from './screens/OnboardingScreen';
+import ScheduleScreen from './screens/ScheduleScreen';
+import ReportsScreen from './screens/ReportsScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 // Ignore specific warnings
 LogBox.ignoreLogs([
@@ -18,7 +21,7 @@ LogBox.ignoreLogs([
 const Stack = createStackNavigator();
 
 const MainApp = () => {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
 
   const navigationTheme = {
     ...DefaultTheme,
@@ -40,7 +43,7 @@ const MainApp = () => {
       />
       <NavigationContainer theme={navigationTheme}>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="Onboarding"
           screenOptions={{
             headerStyle: {
               backgroundColor: theme.surface,
@@ -58,6 +61,11 @@ const MainApp = () => {
           }}
         >
           <Stack.Screen
+            name="Onboarding"
+            component={OnboardingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="Home"
             component={HomeScreen}
             options={{
@@ -69,6 +77,7 @@ const MainApp = () => {
             component={TaskDetailScreen}
             options={{
               title: 'Task Details',
+              headerShown: false,
             }}
           />
           <Stack.Screen
@@ -78,6 +87,21 @@ const MainApp = () => {
               title: 'Task',
               headerShown: false,
             }}
+          />
+          <Stack.Screen
+            name="Schedule"
+            component={ScheduleScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Reports"
+            component={ReportsScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={ProfileScreen}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -94,4 +118,3 @@ const App = () => {
 };
 
 export default App;
-

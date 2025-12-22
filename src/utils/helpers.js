@@ -37,11 +37,43 @@ export const filterTasksByStatus = (tasks, filter) => {
 };
 
 export const getTaskStats = (tasks) => {
+  const now = new Date();
   return {
     active: tasks.filter(t => !t.completed).length,
     completed: tasks.filter(t => t.completed).length,
-    total: tasks.length
+    total: tasks.length,
+    overdue: tasks.filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < now).length
   };
+};
+
+export const getDailyCompletionStats = (tasks) => {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const today = new Date();
+  const stats = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    
+    const dayTasks = tasks.filter(task => {
+      // Use updatedAt for effective date check, fallback to createdAt
+      const taskDate = new Date(task.updatedAt || task.createdAt);
+      return taskDate.getDate() === d.getDate() && 
+             taskDate.getMonth() === d.getMonth() &&
+             taskDate.getFullYear() === d.getFullYear();
+    });
+
+    const total = dayTasks.length;
+    const completed = dayTasks.filter(t => t.completed).length;
+    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    stats.push({
+      day: days[d.getDay()],
+      date: d.getDate(),
+      rate: rate
+    });
+  }
+  return stats;
 };
 
 export const getRelativeTime = (dateString) => {
