@@ -38,7 +38,7 @@ const ReportsScreen = () => {
         setDailyStats(getDailyCompletionStats(result.data));
       }
     } catch (error) {
-       console.log('Error loading stats:', error);
+       // console.log('Error loading stats:', error);
     } finally {
       setRefreshing(false);
     }

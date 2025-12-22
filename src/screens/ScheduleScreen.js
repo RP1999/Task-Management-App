@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import styles from '../styles/ScheduleScreen.styles';
-import { View, Text, StyleSheet, StatusBar, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, typography, spacing } from '../styles/theme';
 import { taskService } from '../services/api';
 import DateSelector from '../components/DateSelector';
 import TaskCard from '../components/TaskCard';
 import BottomNav from '../components/BottomNav';
+import LottieLoader from '../components/LottieLoader';
 
 const ScheduleScreen = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -26,7 +27,7 @@ const ScheduleScreen = ({ navigation }) => {
         setTasks(result.data || []);
       }
     } catch (error) {
-      console.log('Error loading tasks:', error);
+      // console.log('Error loading tasks:', error);
     } finally {
       setLoading(false);
     }
@@ -82,7 +83,7 @@ const ScheduleScreen = ({ navigation }) => {
         </Text>
         
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} style={styles.loaderContainer} />
+          <LottieLoader size={150} style={styles.loaderContainer} />
         ) : (
           <FlatList
             data={filteredTasks}

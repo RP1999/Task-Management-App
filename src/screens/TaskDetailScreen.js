@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, SafeAreaVi
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { taskService } from '../services/api';
 import Icon from 'react-native-vector-icons/Ionicons';
+import LottieLoader from '../components/LottieLoader';
 
 const TaskDetailScreen = ({ route, navigation }) => {
   // ... (logic remains same)
@@ -74,7 +75,7 @@ const TaskDetailScreen = ({ route, navigation }) => {
   if (loading || !task) {
     return (
       <View style={[styles.container, styles.centerContainer]}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LottieLoader size={200} />
       </View>
     );
   }
