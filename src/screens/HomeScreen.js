@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  ActivityIndicator,
+
   Alert,
   StatusBar,
   TextInput,
@@ -30,6 +30,8 @@ import FilterTabs from '../components/FilterTabs';
 import TaskCard from '../components/TaskCard';
 import ProgressCard from '../components/ProgressCard';
 import EmptyState from '../components/EmptyState';
+import LottieLoader from '../components/LottieLoader';
+import NotificationModal from '../components/NotificationModal';
 
 const HomeScreen = ({ navigation }) => {
   const [tasks, setTasks] = useState([]);
@@ -40,6 +42,8 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [notificationTasks, setNotificationTasks] = useState([]);
 
   // Load tasks when screen comes into focus (auto-refresh)
   useFocusEffect(
@@ -60,7 +64,7 @@ const HomeScreen = ({ navigation }) => {
         setTasks(result.data || []);
       }
     } catch (error) {
-       console.log('Error loading tasks:', error);
+       // console.log('Error loading tasks:', error);
     } finally {
       setLoading(false);
     }
@@ -156,11 +160,25 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const handleNotificationPress = () => {
+    const overdueTasks = tasks.filter(t => {
+      if (t.completed || !t.dueDate) return false;
+      return new Date(t.dueDate) < new Date();
+    }).sort((a, b) => {
+      // Sort by last updated (or created) to match Dashboard order
+      const dateA = new Date(a.updatedAt || a.createdAt);
+      const dateB = new Date(b.updatedAt || b.createdAt);
+      return dateB - dateA;
+    });
+    
+    setNotificationTasks(overdueTasks);
+    setModalVisible(true);
+  };
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading tasks...</Text>
+        <LottieLoader size={200} />
       </View>
     );
   }
@@ -188,12 +206,22 @@ const HomeScreen = ({ navigation }) => {
         }
       >
         <View style={styles.header}>
-          <View>
-            <Text style={styles.dashboardTitle}>DASHBOARD</Text>
-            <View style={styles.userInfo}>
-              <Text style={styles.greeting}>Hello,</Text>
-              <Text style={styles.userName}>Dr. Nimal</Text>
+          <View style={styles.headerContent}>
+            <View>
+              <Text style={styles.dashboardTitle}>DASHBOARD</Text>
+              <View style={styles.userInfo}>
+                <Text style={styles.greeting}>Hello,</Text>
+                <Text style={styles.userName}>Dr. Nimal</Text>
+              </View>
             </View>
+            <TouchableOpacity 
+              style={styles.notificationButton}
+              activeOpacity={0.7}
+              onPress={handleNotificationPress}
+            >
+              <View style={styles.notificationBadge} />
+              <Icon name="bell" size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -262,6 +290,12 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Reusable Bottom Navigation */}
       <BottomNav />
+
+      <NotificationModal 
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        tasks={notificationTasks}
+      />
     </View>
   );
 };
