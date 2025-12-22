@@ -9,7 +9,7 @@ class NotificationService {
   configure() {
     PushNotification.configure({
       onNotification: function (notification) {
-        console.log("NOTIFICATION:", notification);
+        // console.log("NOTIFICATION:", notification);
       },
       popInitialNotification: true,
       requestPermissions: Platform.OS === 'ios',
@@ -25,13 +25,13 @@ class NotificationService {
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
       },
-      (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+      (created) => {} // console.log(`createChannel returned '${created}'`)
     );
   }
 
   async scheduleNotification(title, message, date, id) {
     if (!date || new Date(date) <= new Date()) {
-      console.log('Notification skipped: Date is in the past or invalid', date);
+      // console.log('Notification skipped: Date is in the past or invalid', date);
       return;
     }
 
@@ -41,7 +41,7 @@ class NotificationService {
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
       );
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Notification permission denied');
+        // console.log('Notification permission denied');
         return;
       }
     }
@@ -49,12 +49,12 @@ class NotificationService {
     // Ensure channel exists
     PushNotification.channelExists("task-reminders", (exists) => {
       if (!exists) {
-        console.log('Channel "task-reminders" does not exist. Creating it...');
+        // console.log('Channel "task-reminders" does not exist. Creating it...');
         this.configure(); // Re-trigger configure/createChannel
       }
     });
 
-    console.log('Scheduling notification for:', new Date(date));
+    // console.log('Scheduling notification for:', new Date(date));
     PushNotification.localNotificationSchedule({
       id: id,
       channelId: "task-reminders",
